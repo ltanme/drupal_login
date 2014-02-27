@@ -1,0 +1,32 @@
+<?php
+function MYMODULE_menu() {
+  $items['insecure-login/%MYMODULE_insecure_login'] = array(
+      'title' => 'Insecure login',
+      'access callback' => TRUE, // Might as well be, no point in authenticating
+      'page callback' => 'MYMODULE_insecure_login',
+      'page arguments' => array(1)
+  );
+
+  return $items;
+}
+
+function MYMODULE_insecure_login_load($uid) {
+  // Don't let user 1 login with this method
+  if ($uid == 1) {
+    return FALSE;
+  }
+
+  // Just return the user ID
+  return $uid;
+}
+
+function MYMODULE_insecure_login($uid) {
+  if ($account = user_load($uid)) {
+    global $user;
+    $user->uid = $uid;
+    $user->name = $account->name;
+    $user->timezone = $account->timezone;
+    user_login_finalize();
+    drupal_goto('user');
+  }
+}
